@@ -1,0 +1,56 @@
+<script>
+
+  /** ********* เก็บ ip ผู้ใช้ครั้งแรก ********* */
+  document.addEventListener('DOMContentLoaded',async () => {
+    console.log("กำลังดึง IP Address...");
+    await getClientIpAddress();
+    logUserAction('PageLoad'); 
+  });
+
+  /** รับ ip */
+  async function getClientIpAddress() {
+    try {
+      // ใช้บริการ ipify.org (ฟรีและใช้งานง่าย)
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      ipAddress = data.ip;
+      console.log('ipAddress', ipAddress)
+    } catch (error) {
+      console.error('เกิดข้อผิดพลาดในการดึง IP Address:', error);
+      return null;
+    }
+  }
+
+  /** ส่ง log ไปฝั่ง GAS */
+  function logUserAction(actionType, studentId = null) {
+    const timestamp = new Date().toISOString(); // เวลาปัจจุบันในรูปแบบ ISO
+    const userAgent = navigator.userAgent; // ข้อมูล Browser/OS ของผู้ใช้
+
+    const logData = {
+      timestamp: timestamp,
+      ip: ipAddress,
+      userAgent: userAgent,
+      action: actionType
+    };
+
+    if (studentId) {
+      logData.studentId = studentId;
+    }
+
+    // console.log("ข้อมูล Log ที่จะส่ง:", logData);
+
+    try {
+      google.script.run
+        .withSuccessHandler(function(response) {
+          console.log('Log ถูกบันทึกแล้ว:', response);
+        })
+        .withFailureHandler(function(error) {
+          console.error('เกิดข้อผิดพลาดในการบันทึก Log:', error.message);
+        })
+        .saveLog(logData); // เรียกใช้ฟังก์ชัน 'saveLog' ใน GAS
+    } catch (e) {
+      console.error('ไม่สามารถเรียกใช้ Google Apps Script ได้ อาจจะยังไม่ได้ Deploy หรือมีปัญหาการเชื่อมต่อ:', e);
+    }
+  }
+
+</script>
