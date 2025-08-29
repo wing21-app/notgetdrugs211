@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบันทึกการกระทำความผิด กองบิน 21</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #f0f9ff;
+      background-image: radial-gradient(#fcd34d 0.5px, transparent 0.5px), radial-gradient(#fcd34d 0.5px, #f0f9ff 0.5px);
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
+    }
+
+    .student-card {
+      border-radius: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .student-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .input-field {
+      border-radius: 12px;
+      border: 2px solid #e5e7eb;
+      transition: all 0.3s ease;
+    }
+
+    .input-field:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+    }
+
+    .btn {
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .profile-pic-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #60a5fa;
+      display: block;          /* เพิ่มบรรทัดนี้ */
+      margin-left: auto;       /* และบรรทัดนี้ */
+      margin-right: auto;
+    }
+
+    .highlight {
+      background-color: #fef3c7;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    .hidden-card {
+      display: none;
+    }
+
+    .card-container {
+      transition: all 0.3s ease;
+    }
+
+    .match-highlight {
+      border: 2px solid #60a5fa;
+      box-shadow: 0 10px 25px -5px rgba(96, 165, 250, 0.3), 0 8px 10px -6px rgba(96, 165, 250, 0.2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(96, 165, 250, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="bg-white rounded-3xl shadow-lg p-6 mb-8">
+      <div class="flex items-center justify-center mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80" class="mr-4">
+          <!-- หนังสือ -->
+          <rect x="15" y="10" width="50" height="60" rx="4" fill="#60a5fa" />
+          <rect x="20" y="15" width="40" height="50" rx="2" fill="white" />
+          <path d="M25 25 H55" stroke="#e5e7eb" stroke-width="2" />
+          <path d="M25 35 H55" stroke="#e5e7eb" stroke-width="2" />
+          <path d="M25 45 H45" stroke="#e5e7eb" stroke-width="2" />
+
+          <!-- เครื่องหมายถูก -->
+          <circle cx="55" cy="55" r="15" fill="#10b981" />
+          <path d="M48 55 L53 60 L63 50" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
+            fill="none" />
+        </svg>
+        <h1 class="text-3xl font-bold text-blue-500">ระบบบันทึกการกระทำความผิด กองบิน 21</h1>
+      </div>
+
+      <div class="bg-blue-50 rounded-2xl p-6 mb-6 border-2 border-blue-100">
+        <h2 class="text-xl font-semibold text-blue-600 mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          ค้นหาข้อมูลยานพาหนะ
+        </h2>
+
+        <div class="flex flex-wrap items-end gap-4">
+          <div class="flex-grow">
+            <label for="studentId" class="block text-sm font-medium text-gray-700 mb-1">เลขทะเบียนรถ</label>
+            <input type="text" id="studentId" class="input-field w-full px-4 py-3 text-gray-700 bg-white focus:outline-none" placeholder="กรอกเลขทะเบียนรถ">
+          </div>
+          <button id="searchBtn" class="btn bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-xl flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            ค้นหา
+          </button>
+        </div>
+      </div>
+
+      <form id="studentForm" class="hidden bg-yellow-50 rounded-2xl p-6 border-2 border-yellow-100">
+        <h2 class="text-xl font-semibold text-yellow-600 mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          กรอกข้อมูล
+        </h2>
+
+        <div id="inputGroup" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button id="saveBtn" class="btn bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-xl flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            บันทึกข้อมูล
+          </button>
+          <button id="clearFormBtn" type="button" class="btn bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-6 rounded-xl flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            ล้างข้อมูล
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold text-blue-600 mb-4 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-2" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        ข้อมูลยานพาหนะ
+      </h2>
+
+      <div class="mb-6">
+        <div class="relative">
+          <input type="text" id="cardSearch" class="input-field w-full pl-10 pr-4 py-3 text-gray-700 bg-blue-50 focus:outline-none" placeholder="ค้นหาจากชื่อ, เลขทะเบียนรถ...">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <button id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div class="absolute inset-y-0 right-10 pr-3 flex items-center" id="searchResultCount">
+            <span class="text-sm text-gray-500"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="studentCards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-6xl px-4">
+        <!-- ข้อมูลนักเรียนจะถูกแสดงที่นี่ -->
+      </div>
+
+      <div id="noResults" class="hidden text-center py-8">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-gray-500 text-lg">ไม่พบข้อมูลยานพาหนะที่ค้นหา</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-3 mt-4">
+    <p>&copy; 2025 พ.อ.ท.ชวนากร เสมอศรี. All rights reserved.</p>
+  </footer>
+
+  <script>
+
+    /** ********* กำหนดตัวแปรสากล ******** */
+    var ipAddress = null
+    var studentList = []
+    var formSchema = []
+    var studentListReady = false
+    var formSchemaReady = false
+
+    /** ********* SVG สำหรับ placeholder รูปภาพ ********* */
+    const defaultProfileSvg = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRINCA0IDQgMCAwIDAgMCA0djIiPjwvcGF0aD48Y2lyY2xlIGN4PSIxMiIgY3k9IjciIHI9IjQiPjwvY2lyY2xlPjwvc3ZnPg==";
+
+    /** ********* เรียกใช้ฟังก์ชันเมื่อเปิดเว็บ ********* */
+    document.addEventListener('DOMContentLoaded', function () {
+      getSchema()
+      getStudentList()
+    });
+
+    /** ********* รับข้อมูลหัวตาราง ********* */
+    function getSchema() {
+      google.script.run.withSuccessHandler(res => {
+        formSchema = res
+        console.log(formSchema)
+        makeInputStudentForm(formSchema)
+        formSchemaReady = true
+        makeCardFirstTime()
+      }).getSchemaFromSheet()
+    }
+
+    /** ********* รับข้อมูลนักเรียน ********* */
+    function getStudentList() {
+      google.script.run.withSuccessHandler(res => {
+        studentList = res
+        console.log(studentList)
+        studentListReady = true
+        makeCardFirstTime()
+      }).getStudentList()
+    }
+
+    /** สร้าง card ครั้งแรก */
+    function makeCardFirstTime() {
+      if (studentListReady && formSchemaReady) updateStudentCards(studentList)
+    }
+
+    /** สร้างฟอร์มกรอกข้อมูลนักเรียนจาก schema */
+    function makeInputStudentForm(schema) {
+      if (!schema || schema.length === 0) return
+      const inputGroup = document.getElementById('inputGroup')
+      inputGroup.innerHTML = ''
+
+      const readOnly = ['เลขทะเบียนรถ','ชื่อ-นามสกุล','หมายเลขโทรศัพท์','บุคคลติดต่อฉุกเฉิน','หมายเลขโทรศัพท์ฉุกเฉิน','ประเภทรถ']
+
+      let html = ''
+      for (let i = 0; i < schema.length; i++) {
+        const name = schema[i]
+        const id = `input${i}`
+        const ro = readOnly.includes(name)? 'readonly':''
+        const background = readOnly.includes(name)? 'bg-gray-100':'bg-white'
+
+        if (name === 'รูปประจำตัว') {
+          // ใช้ ID ที่แตกต่างกันสำหรับ input file และ img preview เพื่อความชัดเจน
+          const fileInputId = `${id}File`; // เช่น input0File
+          const previewImgId = `${id}Preview`; // เช่น input0Preview
+          const svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>';
+
+          html += '<div>';
+          html += `
+            <label for="${fileInputId}" class="block text-sm font-medium text-gray-700 mb-1">${name}</label>
+            <div class="flex items-center space-x-4">
+              <label class="btn bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-xl cursor-pointer">
+                ${svgIcon}
+                เลือกรูปภาพ
+                <input type="file" id="${fileInputId}" name="${name}" class="hidden" accept="image/*" data-preview-target="${previewImgId}">
+              </label>
+              <img id="${previewImgId}" src="${defaultProfileSvg}" alt="${name} Preview" class="profile-pic-preview" data-original-src="${defaultProfileSvg}">
+            </div>
+          `;
+          html += '</div>';
+        } else {
+          html += '<div>'
+          html += `<label for="${id}" class="block text-sm font-medium text-gray-700 mb-1">${name}</label>
+          <input type="text" id="input${i}" name="${name}" class="input-field w-full px-4 py-3 text-gray-700 ${background} focus:outline-none" placeholder="กรอก${name}" ${ro} required>`
+          html += '</div>'
+        }
+
+      }
+
+      inputGroup.innerHTML = html
+
+      //แสดงตัวอย่างภาพ
+      const fileInputs = inputGroup.querySelectorAll('input[type="file"][data-preview-target]');
+        fileInputs.forEach(fileInput => {
+          fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const previewId = e.target.dataset.previewTarget; // ดึง ID ของ preview
+            const previewImg = document.getElementById(previewId);
+
+            if (file && previewImg) {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                previewImg.src = event.target.result;
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+      });
+    }
+
+    /** กำหนดตัวแปรองค์ประกอบ */
+    const studentIdInput = document.getElementById('studentId')
+    const searchBtn = document.getElementById('searchBtn');
+    const studentForm = document.getElementById('studentForm');
+    const inputGroup = document.getElementById('inputGroup');
+    const saveBtn = document.getElementById('saveBtn');
+    const clearFormBtn = document.getElementById('clearFormBtn');
+    const studentCards = document.getElementById('studentCards');
+    const cardSearch = document.getElementById('cardSearch');
+    const noResults = document.getElementById('noResults');
+    const searchResultCount = document.getElementById('searchResultCount');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    /** คลิกค้นหาเลขประจำตัวนักเรียน */
+    searchBtn.addEventListener('click', () => {
+      const studentId = studentIdInput.value.trim();
+      if (!studentId) {
+        alert('กรุณากรอกเลขทะเบียนรถ');
+        return;
+      }
+
+      const studentData = studentList[studentId];
+      if (studentData) {
+        console.log('studentData', studentData)
+        logUserAction('search', studentId)
+
+        // แสดงข้อมูลนักเรียนในฟอร์ม
+        const formElements = inputGroup.querySelectorAll('input[name], select[name], textarea[name]');
+
+        formElements.forEach(element => {
+          const fieldName = element.name; // ดึงค่า name ของ Element นั้นๆ
+          
+          // ตรวจสอบว่ามีข้อมูลสำหรับ field นี้ใน studentData หรือไม่
+          if (studentData.hasOwnProperty(fieldName)) {
+            const value = studentData[fieldName];
+
+            // ****** 'รูปประจำตัว' ******
+            if (fieldName === 'รูปประจำตัว') {
+              const index = formSchema.indexOf('รูปประจำตัว'); // ต้องใช้ formSchema ที่คุณมี
+              if (index !== -1) {
+                const previewImgId = `input${index}Preview`;
+                const previewImg = document.getElementById(previewImgId);
+
+                if (previewImg && value) {
+                  // previewImg.src = value; // value คือ base64 string ที่มาจาก GAS
+                  previewImg.src = formatUrlToPreview(value)
+                  const currentSrc = value.startsWith('http')? value:''
+                  previewImg.dataset.currentSrc = currentSrc
+                } else {
+                  // หากไม่มีรูปภาพ หรือ value เป็น null/empty
+                  previewImg.src = defaultProfileSvg;
+                  previewImg.dataset.currentSrc = '';
+                }
+              }
+            } 
+            // ****** จบส่วน 'รูปประจำตัว' ******
+
+            // ส่วนการตั้งค่า input อื่นๆ ที่ไม่ใช่ 'รูปประจำตัว'
+            else {
+              // จัดการ input type="date"
+              if (fieldName === 'ครั้งที่ 1' && element.type !== 'text') {
+                element.type = 'text'; // ตั้งค่า type เป็น date
+              } else if (fieldName === 'ครั้งที่ 2' && element.type !== 'text') {
+                element.type = 'text'; // ตั้งค่า type เป็น tel
+              } else if (fieldName === 'ครั้งที่ 3' && element.type !== 'text') {
+                element.type = 'text'; // ตั้งค่า type เป็น text หรือ number (ขึ้นอยู่กับ format ที่ต้องการ)
+              }
+              element.value = value || ''; 
+            }
+          } else {
+            // หาก studentData ไม่มี field นั้น ให้เคลียร์ค่า input นั้น
+            element.value = '';
+          }
+        })        
+        studentForm.classList.remove('hidden');
+      } else {
+        alert('ไม่พบข้อมูล');
+        studentForm.classList.add('hidden');
+      }
+    });
+
+    /** ******* Event Listener สำหรับการ Submit ฟอร์ม ******** */
+    studentForm.addEventListener('submit', (event) => {
+      event.preventDefault(); // ป้องกันการ Submit ฟอร์มแบบปกติ
+
+      // ตรวจสอบว่ามีการเลือกภาพใหม่หรือไม่
+      const fileInput = inputGroup.querySelector('input[type="file"]');
+      const previewImg = inputGroup.querySelector('img.profile-pic-preview');
+
+      const currentSrc = previewImg?.dataset.currentSrc || '';
+      const previewSrc = previewImg?.src || '';
+
+      if (!fileInput.files.length && currentSrc === '' && previewSrc === defaultProfileSvg) {
+        alert('กรุณาเลือกรูปภาพ');
+        fileInput.closest('label').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+
+      const studentId = studentIdInput.value.trim();
+      if (!studentId) {
+        alert('กรุณากรอกเลขทะเบียนรถ');
+        return;
+      }
+
+      logUserAction('submit', studentId)
+
+      // Optional: แสดง loading indicator หรือ disable ปุ่ม
+      const saveBtn = document.getElementById('saveBtn');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = '⏳ กำลังบันทึก...';
+      }
+    
+      google.script.run
+        .withSuccessHandler(res => {
+          console.log('บันทึกข้อมูลสำเร็จ:', res);
+          logUserAction('submit successed '+res, studentId)
+          alert('บันทึกข้อมูลสำเร็จ!');
+          clearForm(); 
+          getStudentList();
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'บันทึกข้อมูล';
+          }
+        })
+        .withFailureHandler(error => {
+          console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล:', error);
+          logUserAction(error, studentId)
+          alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + error.message);
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'บันทึกข้อมูล';
+          }
+        })
+        .saveStudentData(studentForm); // ส่ง Element ของฟอร์มไปตรงๆ
+    });
+
+    /** อัพเดทการแสดงผลข้อมูลนักเรียน */
+    function updateStudentCards(list) {
+      if (!list) list = studentList;
+      studentCards.innerHTML = '';
+
+      // 🔽 แปลง list เป็น array แล้ว sort ตามเลขประจำตัว (แปลงเป็นตัวเลขก่อนเปรียบเทียบ)
+      const sortedList = Object.values(list).sort((a, b) => {
+        return parseInt(a['เลขทะเบียนรถ']) - parseInt(b['เลขทะเบียนรถ']);
+      });
+
+      sortedList.forEach(student => {
+        const card = document.createElement('div');
+        card.className = 'student-card bg-blue-50 shadow-xl rounded-2xl p-6 w-full max-w-sm text-center';
+
+        console.log(student);
+
+        // เตรียมข้อมูล joinData สำหรับการค้นหา
+        let joinData = [];
+        formSchema.forEach(name => {
+          if (student[name]) joinData.push(student[name]);
+        });
+        card.dataset.joinData = joinData.join('|');
+
+        // จัดรูปแบบวันเกิดแบบไทย
+        //const formattedBirthdate = formattedBirthdateTH(student.วันเกิด);//
+
+        // เริ่มประกอบ HTML
+        let html = `
+          <img src="${formatUrlToPreview(student.รูปประจำตัว) || defaultProfileSvg}" alt="${student['ชื่อ-นามสกุล']}" class="profile-pic-preview mb-3">
+          <div class="flex justify-center items-center mb-2">
+            <div class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mr-2">เลขทะเบียนรถ ${student.เลขทะเบียนรถ}</div>
+          </div>
+          <h2 class="text-xl font-bold text-center text-gray-800 mb-4 overflow-hidden text-ellipsis whitespace-nowrap">${student['ชื่อ-นามสกุล']}</h2>
+        `;
+
+        if (formSchema && formSchema.length !== 0) {
+          html += '<ul class="text-sm text-gray-700 space-y-2 text-left">';
+          const skip = ['เลขทะเบียนรถ', 'ชื่อ-นามสกุล', 'หมายเลขโทรศัพท์', 'บุคคลติดต่อฉุกเฉิน', 'หมายเลขโทรศัพท์ฉุกเฉิน', 'รูปประจำตัว'];
+          formSchema.forEach(name => {
+            if (skip.includes(name)) return;
+            const value = name === 'วันเกิด' && formattedBirthdate ? formattedBirthdate : (student[name] || '-');
+            html += `
+              <li class="flex justify-between border-b pb-1">
+                <span class="font-medium">${name}:</span>
+                <span>${value}</span>
+              </li>
+            `;
+          });
+          html += '</ul>';
+        }
+
+        card.innerHTML = html;
+        studentCards.appendChild(card);
+      });
+    }
+
+    /** ค้นหาและกรองการ์ดนักเรียน */
+    cardSearch.addEventListener('input', () => {
+      const searchTerm = cardSearch.value.trim().toLowerCase();
+      if (searchTerm !== '') {
+        clearSearchBtn.classList.remove('hidden');
+        filterStudentCards(searchTerm)
+      } else {
+        clearSearchBtn.classList.add('hidden');
+      }
+      
+    });
+
+    /** ล้างการค้นหา */
+    clearSearchBtn.addEventListener('click', () => {
+      cardSearch.value = '';
+      filterStudentCards('');
+      clearSearchBtn.classList.add('hidden');
+    });
+
+    /** ฟังก์ชันกรองการ์ดนักเรียน */
+    function filterStudentCards(searchTerm) {
+      console.log(searchTerm)
+      const cards = document.querySelectorAll('.student-card');
+      let visibleCount = 0;
+      
+      if (searchTerm === '') {
+        // ถ้าไม่มีคำค้นหา แสดงทุกการ์ด
+        cards.forEach(card => {
+          card.classList.remove('hidden-card');
+          visibleCount++;
+        });
+        noResults.classList.add('hidden');
+        searchResultCount.querySelector('span').textContent = '';
+        return;
+      }
+      
+      // คำนวณคะแนนความตรงกับคำค้นหาสำหรับแต่ละการ์ด
+      cards.forEach(card => {
+        const joinData = card.dataset.joinData.toLowerCase()
+        if (joinData.includes(searchTerm)) {
+          card.classList.remove('hidden-card');
+          visibleCount++
+        } else {
+          card.classList.add('hidden-card')
+        }
+      })
+      
+      // แสดงข้อความเมื่อไม่พบข้อมูล
+      if (visibleCount === 0) {
+          noResults.classList.remove('hidden');
+      } else {
+          noResults.classList.add('hidden');
+      }
+      
+      // แสดงจำนวนผลลัพธ์
+      searchResultCount.querySelector('span').textContent = `พบ ${visibleCount} รายการ`;
+    }
+
+    /** เพิ่มเอฟเฟกต์เมื่อกดปุ่ม Enter ในช่องค้นหา */
+    cardSearch.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const searchTerm = cardSearch.value.trim().toLowerCase();
+        filterStudentCards(searchTerm);
+      }
+    });
+
+    /** ********* ฟังก์ชันสำหรับล้างข้อมูลในฟอร์ม ********* */
+    function clearForm() {
+      // 1. ล้างค่าใน input fields ทั้งหมดใน inputGroup
+      const formElements = inputGroup.querySelectorAll('input[name], select[name], textarea[name]');
+      formElements.forEach(element => {
+        // สำหรับ input type="file" ต้องเคลียร์ค่าเป็น String ว่างไม่ได้
+        if (element.type === 'file') {
+            element.value = ''; // เคลียร์ไฟล์ที่เลือก
+            // และตั้งค่า src ของ img preview กลับไปเป็น default SVG
+            const previewId = element.dataset.previewTarget; // ดึง ID ของ preview
+            const previewImg = document.getElementById(previewId);
+            if (previewImg) {
+              previewImg.src = defaultProfileSvg;
+            }
+        } else {
+          element.value = ''; // เคลียร์ค่า input อื่นๆ
+        }
+      })
+
+      if (studentIdInput) {
+        studentIdInput.value = '';
+      }
+
+      studentForm.classList.add('hidden');
+    }
+
+    /** ********* เพิ่ม Event Listener ให้ปุ่ม "ล้างข้อมูล" ********* */
+    clearFormBtn.addEventListener('click', () => {
+        clearForm(); // เรียกใช้ฟังก์ชันล้างฟอร์ม
+        console.log('ข้อมูลในฟอร์มถูกล้างและซ่อนฟอร์มแล้ว');
+    });
+
+    /** ********* ฟังก์ชันปรับ url ให้พร้อม preview ********* */
+    function formatUrlToPreview(url) {
+      if (url.startsWith('https://drive.google.com/file/d/')) {
+        // แปลงเป็น direct view link
+        const driveFileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (driveFileIdMatch && driveFileIdMatch[1]) {
+            const fileId = driveFileIdMatch[1];
+            return `https://lh3.googleusercontent.com/d/${fileId}`
+        } else {
+            return defaultProfileSvg
+        }
+      } else if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url
+      } else {
+        return ''
+      }
+    }
+
+    /** ********* ฟังก์ชันปรับวันที่ ******** */
+    function formattedBirthdateTH(date) {
+      if (date) {
+        const formattedDate = new Date(date);
+        const formattedBirthdate = formattedDate.toLocaleDateString('th-TH', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        return formattedBirthdate
+      }
+      else return date || ''
+    }
+
+  </script>
+  <?!= include('log') ?>
+</body>
+
+</html>
